@@ -1,10 +1,15 @@
+import { BrowserRouter as Router, Switch  , Route } from 'react-router-dom';
 import './App.css';
-import { FaBeer } from 'react-icons/fa';
+import Todos from './components/Todos/Todos';
 
 function App() {
   return (
-    <div className="text-center fs-1">
-      Hello World <FaBeer />
+    <div>
+      <Router>
+        <Switch>
+          <Route exact path="/" component={Todos}/>
+        </Switch>
+      </Router>
    </div>
   );
 }
