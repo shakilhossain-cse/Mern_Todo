@@ -1,31 +1,32 @@
 import Button from "@restart/ui/esm/Button";
-import React, { useRef } from "react";
+import React from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Container, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link,useHistory } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useForm } from "react-hook-form";
 
 const notifySuccess = () => toast.success("Added Your Task");
 const notifyError = () => toast.error("This didn't work.");
 
 const AddTodo = () => {
+
+  const { register, handleSubmit, formState: { errors } } = useForm();
+
   const renderTooltip = (props) => (
     <Tooltip id="button-tooltip" {...props}>
       Back To All Todos
     </Tooltip>
   );
-  const titleRef = useRef("");
-  const descriptionRef = useRef("");
 
-    const history = useHistory()
-  const submitHandeler = (e) => {
-    e.preventDefault();
-    const title = titleRef.current.value;
-    const description = descriptionRef.current.value;
+
+  const history = useHistory()
+  
+  const onSubmit = task => {
     fetch("http://localhost:5000/addtodo", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: title, description: description }),
+      body: JSON.stringify({ title: task.title, description: task.description }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -36,7 +37,8 @@ const AddTodo = () => {
           notifyError();
         }
       });
-  };
+  }
+
   return (
     <div>
       <Container className="bg-light mt-5 w-50">
@@ -55,7 +57,7 @@ const AddTodo = () => {
           </OverlayTrigger>
         </div>
         <div className="p-3">
-          <form onSubmit={submitHandeler}>
+          <form  onSubmit={handleSubmit(onSubmit)}>
             <div className="my-3">
               <label htmlFor="title">Title </label>
               <input
@@ -63,8 +65,9 @@ const AddTodo = () => {
                 type="text"
                 className="form-control"
                 placeholder="type anythig for search ...."
-                ref={titleRef}
+                {...register("title", { required: true})}
               />
+               {errors.title && <span className="text-danger">This title field is required</span>}
             </div>
 
             <div className="my-3">
@@ -73,8 +76,9 @@ const AddTodo = () => {
                 id="description"
                 className="form-control "
                 placeholder="todo detiles ...."
-                ref={descriptionRef}
+                {...register("description", { required: true })}   
               ></textarea>
+              {errors.description && <span className="text-danger">This description field is required</span>}
             </div>
             <Button className="w-100 btn btn-outline-dark" type="submit">
               Add Todo
